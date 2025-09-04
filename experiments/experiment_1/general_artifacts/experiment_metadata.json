@@ -1,0 +1,35 @@
+{
+  "config": {
+    "data_prep": {
+      "version": "1.0",
+      "dataset_name": "iris",
+      "feature_columns": [
+        "SepalLengthCm",
+        "SepalWidthCm",
+        "PetalLengthCm",
+        "PetalWidthCm"
+      ],
+      "target_column": "Species"
+    },
+    "model": {
+      "model_type": "svm",
+      "model_params": {
+        "kernel": "rbf",
+        "random_state": 42,
+        "probability": true
+      }
+    }
+  },
+  "results": {
+    "cv_accuracy_mean": 0.9666666666666668,
+    "cv_auc_mean": 0.9989583333333332,
+    "test_accuracy": 0.9666666666666667,
+    "test_auc_macro": 0.9966666666666667
+  },
+  "generated_plots": [
+    "confusion_matrix.html",
+    "roc_curves.html",
+    "metrics_summary.html",
+    "cv_results.html"
+  ]
+}

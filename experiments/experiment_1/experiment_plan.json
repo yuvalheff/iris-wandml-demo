@@ -1,0 +1,136 @@
+{
+  "experiment_name": "Iris Multi-class Classification Baseline",
+  "experiment_description": "Baseline experiment for iris species classification using simple preprocessing and proven algorithms",
+  "task_type": "multiclass classification",
+  "target_column": "Species",
+  "evaluation_metric": "Macro-averaged AUC",
+  "data_paths": {
+    "train_path": "/Users/yuvalheffetz/ds-agent-projects/session_3e0a615d-9170-492c-b8ab-7121cbd38bd2/data/train_set.csv",
+    "test_path": "/Users/yuvalheffetz/ds-agent-projects/session_3e0a615d-9170-492c-b8ab-7121cbd38bd2/data/test_set.csv"
+  },
+  "preprocessing_steps": {
+    "step_1": {
+      "action": "Remove identifier column",
+      "details": "Drop the 'Id' column as it provides no predictive value",
+      "columns_affected": ["Id"]
+    },
+    "step_2": {
+      "action": "Extract features and target",
+      "details": "Select feature columns: ['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm'] and target column: 'Species'",
+      "feature_columns": ["SepalLengthCm", "SepalWidthCm", "PetalLengthCm", "PetalWidthCm"],
+      "target_column": "Species"
+    },
+    "step_3": {
+      "action": "Encode target labels",
+      "details": "Use sklearn.preprocessing.LabelEncoder to convert species names to numeric labels for model training",
+      "encoder": "LabelEncoder"
+    },
+    "step_4": {
+      "action": "Standardize features",
+      "details": "Apply sklearn.preprocessing.StandardScaler to normalize feature scales. Based on experiments, standardization shows minimal impact but provides consistency",
+      "scaler": "StandardScaler"
+    }
+  },
+  "feature_engineering_steps": {
+    "approach": "Minimal feature engineering",
+    "rationale": "Exploration experiments showed that additional engineered features (ratios, areas, totals) provide no meaningful improvement over original features. The original four features already provide excellent class separability.",
+    "steps": {
+      "step_1": {
+        "action": "Use original features only",
+        "details": "Maintain the original four botanical measurements as they provide optimal discrimination between species"
+      }
+    }
+  },
+  "model_selection_strategy": {
+    "primary_algorithm": "Support Vector Machine (SVM)",
+    "rationale": "SVM achieved the highest test accuracy (96.67%) and macro AUC (99.67%) in exploration experiments, demonstrating superior performance on this linearly separable dataset",
+    "hyperparameters": {
+      "kernel": "rbf",
+      "random_state": 42,
+      "probability": true
+    },
+    "backup_algorithms": [
+      {
+        "name": "Logistic Regression",
+        "rationale": "Second-best performer with 93.33% accuracy and 99.67% macro AUC. Provides good interpretability and baseline comparison",
+        "hyperparameters": {
+          "random_state": 42,
+          "max_iter": 1000
+        }
+      },
+      {
+        "name": "Random Forest",
+        "rationale": "Ensemble method for comparison, achieved 90% accuracy. Provides feature importance insights",
+        "hyperparameters": {
+          "n_estimators": 100,
+          "random_state": 42
+        }
+      }
+    ]
+  },
+  "evaluation_strategy": {
+    "primary_metric": "Macro-averaged AUC",
+    "additional_metrics": ["accuracy", "precision", "recall", "f1-score"],
+    "cross_validation": {
+      "method": "5-fold stratified cross-validation",
+      "purpose": "Validate model stability during development"
+    },
+    "test_evaluation": {
+      "method": "Single holdout test set evaluation",
+      "details": "Final model performance assessment on unseen 30-sample test set"
+    },
+    "diagnostic_analyses": [
+      {
+        "analysis": "Per-class performance analysis",
+        "purpose": "Identify which species are harder to classify and potential class-specific issues",
+        "implementation": "Generate classification report with per-class precision, recall, and F1-scores"
+      },
+      {
+        "analysis": "Confusion matrix analysis",
+        "purpose": "Understand specific misclassification patterns between species pairs",
+        "implementation": "Generate and visualize confusion matrix to identify which species pairs are most commonly confused"
+      },
+      {
+        "analysis": "Feature importance analysis",
+        "purpose": "Understand which botanical measurements are most discriminative for classification",
+        "implementation": "Use Random Forest feature importance and Logistic Regression coefficients to rank feature contributions"
+      },
+      {
+        "analysis": "Prediction confidence analysis",
+        "purpose": "Assess model certainty and identify low-confidence predictions that may need attention",
+        "implementation": "Analyze prediction probabilities distribution and identify samples with low maximum probability"
+      }
+    ]
+  },
+  "expected_outputs": {
+    "model_files": [
+      "trained_svm_model.pkl",
+      "trained_logistic_model.pkl", 
+      "trained_rf_model.pkl",
+      "label_encoder.pkl",
+      "feature_scaler.pkl"
+    ],
+    "evaluation_files": [
+      "model_performance_report.json",
+      "confusion_matrices.png",
+      "feature_importance_plot.png",
+      "prediction_confidence_analysis.json"
+    ],
+    "analysis_files": [
+      "per_class_analysis.json",
+      "model_comparison_report.json"
+    ]
+  },
+  "success_criteria": {
+    "minimum_macro_auc": 0.95,
+    "minimum_accuracy": 0.90,
+    "class_balance_requirement": "No single class should have F1-score below 0.85",
+    "confidence_requirement": "At least 90% of predictions should have confidence > 0.7"
+  },
+  "implementation_notes": {
+    "data_quality": "Dataset is clean with no missing values or outliers requiring treatment",
+    "class_balance": "Perfect class balance (40 samples per class in training) requires no special handling",
+    "computational_requirements": "Lightweight algorithms suitable for small dataset size (120 training samples)",
+    "interpretability": "Focus on simple, interpretable models given the classical nature of the dataset"
+  }
+}

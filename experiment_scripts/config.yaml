@@ -1,20 +1,28 @@
 data_prep:
-  dataset: "name"
-  version: "version"
-  dataset_name: "dataset_name"
-  placeholder: "placeholder"
-  
+  version: "1.0"
+  dataset_name: "iris"
+  feature_columns: ["SepalLengthCm", "SepalWidthCm", "PetalLengthCm", "PetalWidthCm"]
+  target_column: "Species"
+  id_column: "Id"
+
 feature_prep:
-  placeholder: "placeholder"
+  apply_scaling: true
+  scaling_method: "standard"
 
 model_evaluation:
-    split_ratio: 0.2
-    placeholder: "placeholder"
+  split_ratio: 0.2
+  cv_folds: 5
+  random_state: 42
+  evaluation_metric: "macro_auc"
+  stratify: true
 
 model:
-    model_type: "model_type"
-    model_params: Dict[str, Any]
-    placeholder: "placeholder"
+  model_type: "svm"
+  model_params:
+    kernel: "rbf"
+    random_state: 42
+    probability: true
+  random_state: 42
 
 
 
