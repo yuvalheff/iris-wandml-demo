@@ -1,0 +1,29 @@
+{
+  "experiment_type": "multi_algorithm_comparison",
+  "algorithms_tested": [
+    "svm_linear",
+    "svm_rbf",
+    "logistic_regression",
+    "random_forest"
+  ],
+  "best_algorithm": "svm_linear",
+  "best_performance": {
+    "metric": "macro_auc",
+    "value": 1.0
+  },
+  "config_summary": {
+    "hyperparameter_optimization": {
+      "method": "GridSearchCV",
+      "scoring": "roc_auc_ovr",
+      "cv_folds": 3
+    }
+  },
+  "generated_plots": [
+    "confusion_matrix.html",
+    "roc_curves.html",
+    "metrics_summary.html",
+    "cv_results.html",
+    "algorithm_performance_comparison.html",
+    "training_time_comparison.html"
+  ]
+}

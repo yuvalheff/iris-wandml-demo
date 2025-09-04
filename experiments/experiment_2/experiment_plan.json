@@ -1,0 +1,220 @@
+{
+  "experiment_id": "experiment_2",
+  "experiment_name": "Multi-Algorithm Comparison with Hyperparameter Optimization",
+  "iteration_number": 2,
+  "date": "2025-09-04",
+  "primary_change": "Implement comprehensive multi-algorithm comparison with hyperparameter optimization as originally planned in Iteration 1 but not executed",
+  
+  "task_details": {
+    "task_type": "multiclass classification",
+    "target_column": "Species",
+    "dataset_columns": {
+      "features": ["SepalLengthCm", "SepalWidthCm", "PetalLengthCm", "PetalWidthCm"],
+      "target": "Species",
+      "identifier": "Id"
+    },
+    "classes": ["Iris-setosa", "Iris-versicolor", "Iris-virginica"]
+  },
+
+  "preprocessing_steps": {
+    "data_loading": {
+      "train_path": "/Users/yuvalheffetz/ds-agent-projects/session_3e0a615d-9170-492c-b8ab-7121cbd38bd2/data/train_set.csv",
+      "test_path": "/Users/yuvalheffetz/ds-agent-projects/session_3e0a615d-9170-492c-b8ab-7121cbd38bd2/data/test_set.csv"
+    },
+    "feature_selection": {
+      "feature_columns": ["SepalLengthCm", "SepalWidthCm", "PetalLengthCm", "PetalWidthCm"],
+      "drop_columns": ["Id"]
+    },
+    "target_encoding": {
+      "method": "LabelEncoder",
+      "column": "Species"
+    },
+    "feature_scaling": {
+      "method": "StandardScaler",
+      "apply_to": ["SepalLengthCm", "SepalWidthCm", "PetalLengthCm", "PetalWidthCm"]
+    }
+  },
+
+  "feature_engineering_steps": {
+    "approach": "Use original botanical features without transformation",
+    "rationale": "Exploration experiments showed polynomial features provide no performance benefit while adding complexity. Original 4 features are already highly discriminative.",
+    "features_to_use": ["SepalLengthCm", "SepalWidthCm", "PetalLengthCm", "PetalWidthCm"],
+    "transformations": "None - keeping original features for interpretability"
+  },
+
+  "model_selection_steps": {
+    "algorithms_to_compare": [
+      {
+        "name": "SVM (Linear)",
+        "class": "sklearn.svm.SVC",
+        "base_params": {"kernel": "linear", "probability": true, "random_state": 42},
+        "hyperparameter_grid": {
+          "C": [0.1, 1, 10, 100]
+        },
+        "rationale": "Exploration showed Linear SVM achieved perfect AUC. Test different regularization strengths."
+      },
+      {
+        "name": "SVM (RBF)",
+        "class": "sklearn.svm.SVC", 
+        "base_params": {"kernel": "rbf", "probability": true, "random_state": 42},
+        "hyperparameter_grid": {
+          "C": [0.1, 1, 10],
+          "gamma": ["scale", 0.001, 0.01, 0.1]
+        },
+        "rationale": "Baseline model from Iteration 1. Test hyperparameter optimization to improve upon 99.7% AUC."
+      },
+      {
+        "name": "Logistic Regression",
+        "class": "sklearn.linear_model.LogisticRegression",
+        "base_params": {"random_state": 42, "max_iter": 1000, "multi_class": "ovr"},
+        "hyperparameter_grid": {
+          "C": [0.01, 0.1, 1, 10],
+          "solver": ["liblinear", "lbfgs"]
+        },
+        "rationale": "Good performance in exploration (99.8% AUC). Linear model provides interpretability."
+      },
+      {
+        "name": "Random Forest",
+        "class": "sklearn.ensemble.RandomForestClassifier",
+        "base_params": {"random_state": 42},
+        "hyperparameter_grid": {
+          "n_estimators": [50, 100, 200],
+          "max_depth": [3, 5, null],
+          "min_samples_split": [2, 5]
+        },
+        "rationale": "Ensemble method with feature importance capabilities. Test tree-based approach vs linear models."
+      }
+    ],
+    "selection_strategy": {
+      "cross_validation": {
+        "method": "StratifiedKFold",
+        "n_splits": 5,
+        "shuffle": true,
+        "random_state": 42
+      },
+      "hyperparameter_optimization": {
+        "method": "GridSearchCV",
+        "scoring": "roc_auc_ovr",
+        "cv_folds": 3,
+        "n_jobs": -1
+      },
+      "final_selection_criteria": "Best macro-averaged AUC score from hyperparameter optimization"
+    }
+  },
+
+  "evaluation_strategy": {
+    "primary_metric": "Macro-averaged AUC",
+    "secondary_metrics": ["accuracy", "precision_macro", "recall_macro", "f1_macro"],
+    "evaluation_components": [
+      {
+        "component": "Cross-Validation Performance",
+        "description": "Compare all 4 algorithms using 5-fold stratified CV to assess consistency and generalization",
+        "metrics": ["accuracy", "macro_auc"],
+        "purpose": "Identify best performing algorithm family and assess variance across folds"
+      },
+      {
+        "component": "Hyperparameter Optimization Results", 
+        "description": "Document best parameters found for each algorithm and performance improvement over defaults",
+        "metrics": ["best_cv_auc", "best_params"],
+        "purpose": "Quantify benefit of hyperparameter tuning and identify optimal configurations"
+      },
+      {
+        "component": "Test Set Performance",
+        "description": "Evaluate optimized models on holdout test set to measure true generalization performance",
+        "metrics": ["test_accuracy", "test_auc_macro", "confusion_matrix"],
+        "purpose": "Compare final model performance against Iteration 1 baseline and assess overfitting"
+      },
+      {
+        "component": "Algorithm Comparison Analysis",
+        "description": "Detailed comparison of all 4 algorithms across multiple dimensions",
+        "analyses": [
+          "Performance ranking by AUC and accuracy",
+          "Training time comparison",
+          "Model complexity analysis (number of parameters/features used)",
+          "Interpretability assessment"
+        ],
+        "purpose": "Understand relative strengths/weaknesses of each approach for iris classification"
+      },
+      {
+        "component": "Feature Importance Analysis",
+        "description": "Extract and compare feature importance from models that support it",
+        "models": ["Random Forest", "Logistic Regression coefficients"],
+        "purpose": "Validate which botanical features are most discriminative across different algorithm types"
+      },
+      {
+        "component": "Per-Class Performance Analysis",
+        "description": "Break down performance by iris species to identify any class-specific patterns",
+        "metrics": ["per_class_precision", "per_class_recall", "per_class_f1"],
+        "purpose": "Identify if any species are systematically harder to classify across algorithms"
+      }
+    ]
+  },
+
+  "expected_outputs": {
+    "model_artifacts": [
+      "trained_models.pkl (all 4 optimized models)",
+      "best_hyperparameters.json",
+      "data_processor.pkl",
+      "feature_processor.pkl"
+    ],
+    "performance_reports": [
+      "algorithm_comparison_summary.json",
+      "hyperparameter_optimization_results.json", 
+      "cross_validation_detailed_results.json"
+    ],
+    "visualizations": [
+      "algorithm_performance_comparison.html",
+      "hyperparameter_heatmaps.html (for each algorithm)",
+      "confusion_matrices_all_models.html",
+      "roc_curves_comparison.html",
+      "feature_importance_comparison.html",
+      "training_time_analysis.html"
+    ],
+    "analysis_reports": [
+      "model_selection_rationale.md",
+      "performance_vs_iteration1_comparison.md",
+      "algorithm_strengths_weaknesses.md"
+    ]
+  },
+
+  "success_criteria": {
+    "primary": {
+      "metric": "Macro-averaged AUC",
+      "target": ">= 0.997",
+      "description": "Match or exceed Iteration 1 baseline performance"
+    },
+    "secondary": [
+      {
+        "metric": "Test Accuracy", 
+        "target": ">= 0.967",
+        "description": "Match or exceed Iteration 1 baseline accuracy"
+      },
+      {
+        "metric": "Algorithm Implementation",
+        "target": "4 algorithms successfully implemented and compared",
+        "description": "Complete the multi-algorithm comparison that was planned but not executed in Iteration 1"
+      },
+      {
+        "metric": "Hyperparameter Optimization",
+        "target": "Performance improvement demonstrated for at least 2 algorithms",
+        "description": "Show quantifiable benefit of hyperparameter tuning"
+      }
+    ]
+  },
+
+  "implementation_notes": {
+    "key_differences_from_iteration1": [
+      "Implement all 4 planned algorithms instead of just SVM",
+      "Add comprehensive hyperparameter optimization using GridSearchCV",
+      "Include detailed algorithm comparison analysis",
+      "Add feature importance analysis where applicable"
+    ],
+    "technical_considerations": [
+      "Use consistent random_state=42 across all models for reproducibility",
+      "Apply same preprocessing pipeline to all algorithms for fair comparison", 
+      "Use roc_auc_ovr scoring for multiclass AUC calculation",
+      "Save all trained models for potential ensemble in future iterations"
+    ],
+    "time_expectations": "Longer runtime due to 4 algorithms × hyperparameter grids, but necessary for comprehensive comparison"
+  }
+}
